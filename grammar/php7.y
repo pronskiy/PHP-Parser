@@ -91,6 +91,7 @@ optional_comma:
 
 attribute_decl:
       class_name                                            { $$ = Node\Attribute[$1, []]; }
+    | '<' class_name '>'                                    { $$ = Node\GenericAttribute[$2, []]; }
     | class_name argument_list                              { $$ = Node\Attribute[$1, $2]; }
 ;
 
@@ -355,6 +356,8 @@ function_declaration_statement:
           { $$ = Stmt\Function_[$3, ['byRef' => $2, 'params' => $5, 'returnType' => $7, 'stmts' => $8, 'attrGroups' => []]]; }
     | attributes T_FUNCTION optional_ref identifier_not_reserved '(' parameter_list ')' optional_return_type block_or_error
           { $$ = Stmt\Function_[$4, ['byRef' => $3, 'params' => $6, 'returnType' => $8, 'stmts' => $9, 'attrGroups' => $1]]; }
+//    | attributes T_FUNCTION optional_ref identifier_not_reserved '(' parameter_list ')' optional_return_type block_or_error
+//              { $$ = Stmt\Function_[$4, ['byRef' => $3, 'params' => $6, 'returnType' => $9, 'stmts' => $10, 'attrGroups' => $1, 'returnAttr' => $8,]]; }
 ;
 
 class_declaration_statement:
@@ -641,6 +644,7 @@ optional_type_without_static:
 optional_return_type:
       /* empty */                                           { $$ = null; }
     | ':' type_expr                                         { $$ = $2; }
+    | ':' attributes type_expr                              { $$ = Node\Identifier[$3, init($2)]; }
     | ':' error                                             { $$ = null; }
 ;
 
